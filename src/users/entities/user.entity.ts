@@ -1,5 +1,7 @@
-import { Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 
+@Entity()
 export class User {
 
     @PrimaryGeneratedColumn('uuid')
@@ -16,4 +18,19 @@ export class User {
 
     @Column()
     password: string;
+
+    @CreateDateColumn()
+    createdAt: Date;
+
+    @UpdateDateColumn()
+    updatedAt: Date;
+
+    async comparePassword(plain: string): Promise<boolean> {
+        return bcrypt.compare(plain, this.password);
+    }
+
+    async setPassword(raw: string): Promise<void> {
+        this.password = await bcrypt.hash(raw, 10);
+    }
+
 }

@@ -1,14 +1,22 @@
 // src/tasks/dto/create-task.dto.ts
-import { IsString, IsNotEmpty, IsOptional, MaxLength } from 'class-validator';
+import { Expose } from 'class-transformer';
 
-export class CreateTaskDto {
-  @IsString()
-  @IsNotEmpty()
-  @MaxLength(100)
+export class TaskResponseDto {
+  @Expose()
+  id: string;
+
+  @Expose()
   title: string;
 
-  @IsString()
-  @IsOptional()
-  @MaxLength(500)
-  description?: string;
+  @Expose()
+  description?: string | null;
+
+  @Expose()
+  completed: boolean;
+
+  @Expose()
+  ownerId: string;
+
+  @Expose()
+  createdAt: Date;
 }

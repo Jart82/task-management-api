@@ -1,3 +1,4 @@
+// src/users/dto/user-response.dto.ts
 import { Exclude, Expose } from 'class-transformer';
 
 @Exclude()
@@ -17,8 +18,5 @@ export class UserResponseDto {
   @Expose()
   createdAt: Date;
 
-  @Expose()
-  updatedAt: Date;
-
-  // ❌ Never expose password, salt, tokens, etc.
+  // ❌ Never expose: password, salt, tokens, etc.
 }
