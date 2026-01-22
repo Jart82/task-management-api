@@ -1,21 +1,19 @@
 // src/users/users.service.ts
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Injectable, BadRequestException, NotFoundException, PreconditionFailedException } from '@nestjs/common';
 import { User } from './entities/user.entity';
 import { RegisterUserDto } from './dto/register-user.dto';
+import { UserRepository } from './repositories/user.repository';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(User)
-    private usersRepository: Repository<User>,
+    private readonly usersRepository: UserRepository
   ) {}
 
   async create(dto: RegisterUserDto): Promise<User> {
     const existing = await this.findByEmail(dto.email);
     if (existing) {
-      throw new BadRequestException('Email already registered');
+      throw new PreconditionFailedException('Email already registered');
     }
 
     const user = this.usersRepository.create({

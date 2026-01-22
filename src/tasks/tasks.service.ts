@@ -5,28 +5,28 @@ import { Repository } from 'typeorm';
 import { Task } from './entities/task.entity';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
+import { TaskRepository } from './repositories/task.repository';
 
 @Injectable()
 export class TasksService {
   constructor(
-    @InjectRepository(Task)
-    private tasksRepo: Repository<Task>,
+    private taskRepository: TaskRepository
   ) {}
 
   async create(dto: CreateTaskDto, userId: string): Promise<Task> {
-    const task = this.tasksRepo.create({
+    const task = this.taskRepository.create({
       ...dto,
       ownerId: userId,
     });
-    return this.tasksRepo.save(task);
+    return this.taskRepository.save(task);
   }
 
   async findAll(userId: string): Promise<Task[]> {
-    return this.tasksRepo.find({ where: { ownerId: userId } });
+    return this.taskRepository.findByOwnerId(userId);
   }
 
   async findOne(id: string, userId: string): Promise<Task> {
-    const task = await this.tasksRepo.findOne({ where: { id, ownerId: userId } });
+    const task = await this.taskRepository.findOneByIdAndOwner(id, userId);
     if (!task) {
       throw new NotFoundException('Task not found or access denied');
     }
@@ -36,11 +36,11 @@ export class TasksService {
   async update(id: string, dto: UpdateTaskDto, userId: string): Promise<Task> {
     const task = await this.findOne(id, userId); // Reuses ownership check
     Object.assign(task, dto);
-    return this.tasksRepo.save(task);
+    return this.taskRepository.save(task);
   }
 
   async remove(id: string, userId: string): Promise<void> {
-    const result = await this.tasksRepo.delete({ id, ownerId: userId });
+    const result = await this.taskRepository.delete({ id, ownerId: userId });
     if (result.affected === 0) {
       throw new NotFoundException('Task not found or access denied');
     }
